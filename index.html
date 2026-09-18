@@ -61,6 +61,8 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
 .close{border:0;background:#f0f1f4;border-radius:50%;width:34px;height:34px;font-size:18px}
 .footer-note{font-size:12px;color:var(--muted);margin-top:25px}
+
+.guide-grid{grid-template-columns:repeat(3,1fr);align-items:stretch}.guide-step{margin-bottom:0}.guide-step h2{margin:8px 0 8px}.guide-step p{margin:0;color:var(--muted);font-size:14px;line-height:1.7}.guide-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f0f1ff;color:#3838a1;font-weight:800;font-size:15px}
 @media(max-width:800px){
  .app{width:100%;min-width:0}
  .sidebar{width:60px;min-width:60px;flex:0 0 60px;padding:14px 6px;overflow:hidden}
@@ -74,7 +76,9 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
  h1{font-size:22px;line-height:1.25}
  h2{font-size:18px}
  .card{padding:14px;border-radius:14px;margin-bottom:12px}
- .grid,.form-grid,.checkgrid{grid-template-columns:1fr}
+ .grid,.form-grid,.checkgrid,.guide-grid{grid-template-columns:1fr}
+ .guide-step{margin-bottom:12px}
+ .guide-step p{font-size:13px;line-height:1.65}
  .toolbar{gap:7px}
  .toolbar .btn{padding:9px 11px}
  .item{width:100%;min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:10px;padding:12px}
@@ -111,6 +115,7 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
 <aside class="sidebar">
   <div class="logo">Perc<span>PackLog</span></div>
   <nav class="nav">
+    <button data-page="guide">📖 使い方</button>
     <button class="active" data-page="dashboard">🏠 ダッシュボード</button>
     <button data-page="lists">📋 運搬リスト</button>
     <button data-page="instruments">🥁 打楽器一覧</button>
@@ -122,6 +127,24 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
 </aside>
 
 <main class="main">
+<section id="guide" class="page hidden">
+  <div class="header"><div><h1>使い方</h1><div class="sub">PercPackLogを初めて使う方へ。</div></div></div>
+  <div class="card guide-card">
+    <h2>PercPackLogとは？</h2>
+    <p>打楽器の登録から、本番ごとの運搬リスト作成、ケースへの収納、現場でのチェックまでをまとめて管理するアプリです。</p>
+  </div>
+  <div class="grid guide-grid">
+    <div class="card guide-step"><div class="guide-num">1</div><h2>打楽器を登録</h2><p>「打楽器一覧」から、普段使っている打楽器を登録します。必要なら小分類と数量も設定できます。</p></div>
+    <div class="card guide-step"><div class="guide-num">2</div><h2>ケースを登録</h2><p>「ケース一覧」から、スネアケースやスタンドケースなど、使っているケースを登録します。</p></div>
+    <div class="card guide-step"><div class="guide-num">3</div><h2>バンド・曲を登録</h2><p>「バンド管理」と「曲管理」に、出演するバンドや演奏曲を登録します。</p></div>
+    <div class="card guide-step"><div class="guide-num">4</div><h2>運搬リストを作成</h2><p>本番の日付・内容・バンド・運搬する打楽器を選びます。必要に応じてケースへの収納も設定できます。</p></div>
+    <div class="card guide-step"><div class="guide-num">5</div><h2>現場でチェック</h2><p>運搬リストの「PDF」ボタンからチェックリストを開き、持ち出した打楽器をスマホでタップしてチェックできます。</p></div>
+    <div class="card guide-step"><div class="guide-num">6</div><h2>データをバックアップ</h2><p>データは使用しているブラウザに保存されます。「データ管理」からJSONを書き出して、定期的にバックアップしてください。</p></div>
+  </div>
+  <div class="notice">💡 PCとスマホのデータは自動では同期されません。別の端末へ移すときは、JSONバックアップを使ってください。</div>
+  <div class="toolbar"><button class="btn" onclick="showPage('dashboard')">ダッシュボードへ</button></div>
+</section>
+
 <section id="dashboard" class="page">
   <div class="header"><div><h1>ダッシュボード</h1><div class="sub">今日の運搬と、あなたの打楽器をひとまとめに。</div></div>
   <button class="btn" onclick="openListModal()">＋ 運搬リストを作成</button></div>
@@ -208,6 +231,7 @@ function updateStats(){
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');
  document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));document.getElementById(b.dataset.page).classList.remove('hidden');
+ window.scrollTo({top:0,left:0,behavior:'auto'});
  renderAll();
 });
 function renderAll(){renderLists();renderInstruments();renderCases();renderBands();renderSongs();updateStats();}
@@ -829,6 +853,15 @@ function importData(e){
  const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.instruments||!x.bands||!x.songs||!x.lists)throw Error();db=x;db.cases=db.cases||[];db.instruments=(db.instruments||[]).map(i=>({...i,subcategories:Array.isArray(i.subcategories)?i.subcategories:[],subcategoryQuantities:i.subcategoryQuantities||{},caseId:i.caseId||''}));db.lists=(db.lists||[]).map(l=>({...l,instruments:Array.isArray(l.instruments)?l.instruments:[],instrumentSelections:Array.isArray(l.instrumentSelections)?l.instrumentSelections:l.instruments.map(id=>({id,subcategories:[],subcategoryQuantities:{}})),done:l.done===true}));save();renderAll();alert('データを読み込みました。')}catch{alert('正しいPercPackLog JSONではありません。')}};r.readAsText(file);
 }
 function clearAll(){if(confirm('すべてのデータを削除します。この操作は元に戻せません。')){db={instruments:[],cases:[],bands:[],songs:[],lists:[]};save();renderAll();}}
+const GUIDE_SEEN_KEY='percpaklog_guide_seen';
+const guideSeen=localStorage.getItem(GUIDE_SEEN_KEY)==='1';
+if(!guideSeen){
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+  document.querySelector('[data-page="guide"]').classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+  document.getElementById('guide').classList.remove('hidden');
+  localStorage.setItem(GUIDE_SEEN_KEY,'1');
+}
 renderAll();
 </script>
 </body>
