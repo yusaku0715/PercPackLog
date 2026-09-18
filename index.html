@@ -62,7 +62,7 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
 .close{border:0;background:#f0f1f4;border-radius:50%;width:34px;height:34px;font-size:18px}
 .footer-note{font-size:12px;color:var(--muted);margin-top:25px}
 
-.guide-grid{grid-template-columns:repeat(3,1fr);align-items:stretch}.guide-step{margin-bottom:0}.guide-step h2{margin:8px 0 8px}.guide-step p{margin:0;color:var(--muted);font-size:14px;line-height:1.7}.guide-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f0f1ff;color:#3838a1;font-weight:800;font-size:15px}
+.guide-grid{grid-template-columns:repeat(3,1fr);align-items:stretch}.guide-step{margin-bottom:0}.guide-step h2{margin:0 0 8px}.guide-step p{margin:0;color:var(--muted);font-size:14px;line-height:1.7}.guide-title{display:flex;align-items:center;gap:9px;margin-bottom:8px}.guide-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f0f1ff;color:#3838a1;font-weight:800;font-size:15px;flex:0 0 32px}.guide-icon{font-size:24px;line-height:1;display:inline-flex;align-items:center;justify-content:center;min-width:28px}.guide-title h2{flex:1;min-width:0}
 @media(max-width:800px){
  .app{width:100%;min-width:0}
  .sidebar{width:60px;min-width:60px;flex:0 0 60px;padding:14px 6px;overflow:hidden}
@@ -134,12 +134,12 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
     <p>打楽器の登録から、本番ごとの運搬リスト作成、ケースへの収納、現場でのチェックまでをまとめて管理するアプリです。</p>
   </div>
   <div class="grid guide-grid">
-    <div class="card guide-step"><div class="guide-num">1</div><h2>打楽器を登録</h2><p>「打楽器一覧」から、普段使っている打楽器を登録します。必要なら小分類と数量も設定できます。</p></div>
-    <div class="card guide-step"><div class="guide-num">2</div><h2>ケースを登録</h2><p>「ケース一覧」から、スネアケースやスタンドケースなど、使っているケースを登録します。</p></div>
-    <div class="card guide-step"><div class="guide-num">3</div><h2>バンド・曲を登録</h2><p>「バンド管理」と「曲管理」に、出演するバンドや演奏曲を登録します。</p></div>
-    <div class="card guide-step"><div class="guide-num">4</div><h2>運搬リストを作成</h2><p>本番の日付・内容・バンド・運搬する打楽器を選びます。必要に応じてケースへの収納も設定できます。</p></div>
-    <div class="card guide-step"><div class="guide-num">5</div><h2>現場でチェック</h2><p>運搬リストの「PDF」ボタンからチェックリストを開き、持ち出した打楽器をスマホでタップしてチェックできます。</p></div>
-    <div class="card guide-step"><div class="guide-num">6</div><h2>データをバックアップ</h2><p>データは使用しているブラウザに保存されます。「データ管理」からJSONを書き出して、定期的にバックアップしてください。</p></div>
+    <div class="card guide-step"><div class="guide-title"><div class="guide-num">1</div><div class="guide-icon">🥁</div><h2>打楽器を登録</h2></div><p>「打楽器一覧」から、普段使っている打楽器を登録します。必要なら小分類と数量も設定できます。</p></div>
+    <div class="card guide-step"><div class="guide-title"><div class="guide-num">2</div><div class="guide-icon">🧳</div><h2>ケースを登録</h2></div><p>「ケース一覧」から、スネアケースやスタンドケースなど、使っているケースを登録します。</p></div>
+    <div class="card guide-step"><div class="guide-title"><div class="guide-num">3</div><div class="guide-icon">🎸🎵</div><h2>バンド・曲を登録</h2></div><p>「バンド管理」と「曲管理」に、出演するバンドや演奏曲を登録します。</p></div>
+    <div class="card guide-step"><div class="guide-title"><div class="guide-num">4</div><div class="guide-icon">📋</div><h2>運搬リストを作成</h2></div><p>本番の日付・内容・バンド・運搬する打楽器を選びます。必要に応じてケースへの収納も設定できます。</p></div>
+    <div class="card guide-step"><div class="guide-title"><div class="guide-num">5</div><div class="guide-icon">☑️</div><h2>現場でチェック</h2></div><p>運搬リストの「PDF」ボタンからチェックリストを開き、持ち出した打楽器をスマホでタップしてチェックできます。</p></div>
+    <div class="card guide-step"><div class="guide-title"><div class="guide-num">6</div><div class="guide-icon">💾</div><h2>データをバックアップ</h2></div><p>データは使用しているブラウザに保存されます。「データ管理」からJSONを書き出して、定期的にバックアップしてください。</p></div>
   </div>
   <div class="notice">💡 PCとスマホのデータは自動では同期されません。別の端末へ移すときは、JSONバックアップを使ってください。</div>
   <div class="toolbar"><button class="btn" onclick="showPage('dashboard')">ダッシュボードへ</button></div>
