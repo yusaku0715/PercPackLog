@@ -492,7 +492,7 @@ function openPerformanceModal(id=null){
   <div><label>日程 *</label><input type="date" id="fPerfDate" required value="${esc(old?.date||new Date().toISOString().slice(0,10))}"></div>
   <div><label>バンド</label><select id="fPerfBand"><option value="">選択してください</option>${bandOptions}</select></div>
   <div class="full"><label>内容 *</label><input id="fPerfContent" required placeholder="例：ライブ、イベント出演" value="${esc(old?.content||'')}"></div>
-  <div><label>イベント状況</label><select id="fPerfEventDone"><option value="0" ${old?.eventDone?'':'selected'}>未済</option><option value="1" ${old?.eventDone?'selected':''}>済</option></select></div>
+  <div><label>イベント状況</label><label class="check"><input type="checkbox" id="fPerfEventDone" ${old?.eventDone?'checked':''}> イベント済</label></div>
   <div class="full"><label>演奏場所（任意）</label><input id="fPerfVenue" placeholder="例：渋谷○○ホール、下北沢○○" value="${esc(old?.venue||'')}"></div>
   <div class="full"><label>備考（任意）</label><textarea id="fPerfNote" placeholder="集合時間、搬入口、譜面台など">${esc(old?.note||'')}</textarea></div>
  </div><div style="display:flex;justify-content:flex-end;gap:9px;margin-top:20px"><button type="button" class="btn secondary" onclick="closeModal()">キャンセル</button><button class="btn">保存する</button></div></form>
@@ -500,7 +500,7 @@ function openPerformanceModal(id=null){
 }
 function submitPerformance(e,id){
  e.preventDefault();
- const date=document.getElementById('fPerfDate').value, content=document.getElementById('fPerfContent').value.trim(), bandId=document.getElementById('fPerfBand').value, venue=document.getElementById('fPerfVenue').value.trim(), note=document.getElementById('fPerfNote').value.trim(), eventDone=document.getElementById('fPerfEventDone').value==='1';
+ const date=document.getElementById('fPerfDate').value, content=document.getElementById('fPerfContent').value.trim(), bandId=document.getElementById('fPerfBand').value, venue=document.getElementById('fPerfVenue').value.trim(), note=document.getElementById('fPerfNote').value.trim(), eventDone=!!document.getElementById('fPerfEventDone').checked;
  if(!date||!content)return;
  if(id){const p=db.performances.find(x=>x.id===id);if(!p)return;p.date=date;p.content=content;p.bandId=bandId;p.venue=venue;p.note=note;p.eventDone=eventDone;const linkedFee=db.fees.find(f=>f.performanceId===p.id);if(linkedFee){linkedFee.date=date;linkedFee.bandId=bandId;linkedFee.content=content;linkedFee.eventDone=eventDone;p.feeId=linkedFee.id;}}else{const performance={id:uid(),date,content,bandId,venue,note,feeId:'',eventDone};const fee={id:uid(),performanceId:performance.id,date,bandId,content,amount:null,paid:false,receiptIssued:false,paymentMethod:'',eventDone};performance.feeId=fee.id;db.performances.push(performance);db.fees.push(fee);}
  save();closeModal();renderAll();showPage('performances');
@@ -563,7 +563,7 @@ function openFeeModal(id=null){
   <div class="full"><label>内容 *</label><input id="fFeeContent" required placeholder="例：ライブ、レコーディング" value="${esc(info.content)}" ${fieldAttrs}></div>
   <div><label>金額 *</label><input type="number" id="fFeeAmount" min="0" step="1" required value="${esc(old?.amount??'')}"></div>
   <div><label>受け取り方法</label><input id="fFeeMethod" placeholder="例：振込、現金、PayPay" value="${esc(old?.paymentMethod||'')}"></div>
-  <div><label>イベント状況</label><select id="fFeeEventDone"><option value="0" ${(old?.eventDone?'':'selected')}>未済</option><option value="1" ${old?.eventDone?'selected':''}>済</option></select></div>
+  <div><label>イベント状況</label><label class="check"><input type="checkbox" id="fFeeEventDone" ${old?.eventDone?'checked':''}> イベント済</label></div>
   <div><label>受け取り状況</label><label class="check"><input type="checkbox" id="fFeePaid" ${old?.paid?'checked':''}> 受け取り済</label></div>
   <div><label>領収書発行状況</label><label class="check"><input type="checkbox" id="fFeeReceipt" ${old?.receiptIssued?'checked':''}> 発行済</label></div>
  </div><div style="display:flex;justify-content:flex-end;gap:9px;margin-top:20px"><button type="button" class="btn secondary" onclick="closeModal()">キャンセル</button><button class="btn">保存する</button></div></form>
@@ -576,7 +576,7 @@ function submitFee(e,id){
  const linked=!!(performanceId&&db.performances.some(p=>p.id===performanceId));
  const date=document.getElementById('fFeeDate').value, bandId=document.getElementById('fFeeBand').value, content=document.getElementById('fFeeContent').value.trim();
  const rawAmount=document.getElementById('fFeeAmount').value;
- const amount=parseInt(rawAmount||'',10);const eventDone=document.getElementById('fFeeEventDone').value==='1';const paid=!!document.getElementById('fFeePaid').checked;const receiptIssued=!!document.getElementById('fFeeReceipt').checked;const paymentMethod=document.getElementById('fFeeMethod').value.trim();
+ const amount=parseInt(rawAmount||'',10);const eventDone=!!document.getElementById('fFeeEventDone').checked;const paid=!!document.getElementById('fFeePaid').checked;const receiptIssued=!!document.getElementById('fFeeReceipt').checked;const paymentMethod=document.getElementById('fFeeMethod').value.trim();
  if(!date||!content||!Number.isFinite(amount)||amount<0)return;
  const data={id:id||uid(),performanceId,date,bandId,content,amount,eventDone,paid,receiptIssued,paymentMethod};
  if(linked){const p=db.performances.find(x=>x.id===performanceId);data.date=p.date||date;data.bandId=p.bandId||'';data.content=p.content||content;p.eventDone=eventDone;}
