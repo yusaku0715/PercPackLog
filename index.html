@@ -122,6 +122,8 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
     <button data-page="cases">🧳 ケース一覧</button>
     <button data-page="bands">🎸 バンド管理</button>
     <button data-page="songs">🎵 曲管理</button>
+    <button data-page="performances">🎤 本番管理</button>
+    <button data-page="fees">💰 ギャラ管理</button>
     <button data-page="data">💾 データ管理</button>
   </nav>
 </aside>
@@ -140,6 +142,8 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
     <div class="card guide-step"><div class="guide-title"><div class="guide-num">4</div><div class="guide-icon">📋</div><h2>運搬リストを作成</h2></div><p>本番の日付・内容・バンド・運搬する打楽器を選びます。必要に応じてケースへの収納も設定できます。</p></div>
     <div class="card guide-step"><div class="guide-title"><div class="guide-num">5</div><div class="guide-icon">☑️</div><h2>現場でチェック</h2></div><p>運搬リストの「PDF」ボタンからチェックリストを開き、持ち出した打楽器をスマホでタップしてチェックできます。</p></div>
     <div class="card guide-step"><div class="guide-title"><div class="guide-num">6</div><div class="guide-icon">💾</div><h2>データをバックアップ</h2></div><p>データは使用しているブラウザに保存されます。「データ管理」からJSONを書き出して、定期的にバックアップしてください。</p></div>
+    <div class="card guide-step"><div class="guide-title"><div class="guide-num">7</div><div class="guide-icon">🎤</div><h2>本番を管理</h2></div><p>「本番管理」から、本番の日程・バンド・内容を登録して一覧で管理できます。</p></div>
+    <div class="card guide-step"><div class="guide-title"><div class="guide-num">8</div><div class="guide-icon">💰</div><h2>ギャラを管理</h2></div><p>「ギャラ管理」では本番登録時に自動で追加された項目へ、金額・受け取り状況・領収書発行状況・受け取り方法を追記します。レコーディングなどは「＋ ギャラを登録」から手入力できます。</p></div>
   </div>
   <div class="notice">💡 PCとスマホのデータは自動では同期されません。別の端末へ移すときは、JSONバックアップを使ってください。</div>
   <div class="toolbar"><button class="btn" onclick="showPage('dashboard')">ダッシュボードへ</button></div>
@@ -153,6 +157,8 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
     <div class="stat"><div class="num" id="statInst">0</div><div class="label">登録打楽器</div></div>
     <div class="stat"><div class="num" id="statBands">0</div><div class="label">所属バンド</div></div>
     <div class="stat"><div class="num" id="statCases">0</div><div class="label">登録ケース</div></div>
+    <div class="stat"><div class="num" id="statPerformances">0</div><div class="label">登録本番</div></div>
+    <div class="stat"><div class="num" id="statFees">0</div><div class="label">登録ギャラ</div></div>
   </div>
   <div class="card" style="margin-top:18px"><h2>最近の運搬リスト</h2><div id="recentLists" class="list"></div></div>
 </section>
@@ -190,6 +196,28 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
   <div id="songArea"></div>
 </section>
 
+<section id="performances" class="page hidden">
+  <div class="header"><div><h1>本番管理</h1><div class="sub">本番の日程・バンド・内容・演奏場所を登録して一覧化。</div></div><button class="btn" onclick="openPerformanceModal()">＋ 本番を登録</button></div>
+  <div class="toolbar">
+    <input id="performanceSearch" placeholder="日付・内容・場所・バンド名で検索" oninput="renderPerformances()">
+    <div class="list-filter-group"><span>期間：</span><input type="date" id="performanceDateFrom" onchange="renderPerformances()"> <span>～</span> <input type="date" id="performanceDateTo" onchange="renderPerformances()"> <button type="button" class="btn small" onclick="resetPerformanceFilters()">期間リセット</button></div>
+  </div>
+  <div class="item-meta" style="margin:-6px 0 12px">期間を指定すると、その期間の本番だけ表示します。未指定の場合は全期間です。</div>
+  <div id="performanceArea" class="list"></div>
+</section>
+
+<section id="fees" class="page hidden">
+  <div class="header"><div><h1>ギャラ管理</h1><div class="sub">本番登録時に自動追加されたギャラと、レコーディングなどの個別登録を管理。</div></div><button class="btn" onclick="openFeeModal()">＋ ギャラを登録</button></div>
+  <div class="toolbar">
+    <input id="feeSearch" placeholder="日付・内容・バンド名で検索" oninput="renderFees()">
+    <div class="list-filter-group"><span>期間：</span><input type="date" id="feeDateFrom" onchange="renderFees()"> <span>～</span> <input type="date" id="feeDateTo" onchange="renderFees()"> <button type="button" class="btn small" onclick="resetFeeFilters()">期間リセット</button></div>
+    <div class="list-filter-group status-filter"><span>受け取り</span><label class="check compact"><input type="checkbox" id="feePaidPending" onchange="renderFees()"> 未</label><label class="check compact"><input type="checkbox" id="feePaidDone" onchange="renderFees()"> 済</label></div>
+    <div class="list-filter-group status-filter"><span>領収書</span><label class="check compact"><input type="checkbox" id="feeReceiptPending" onchange="renderFees()"> 未</label><label class="check compact"><input type="checkbox" id="feeReceiptDone" onchange="renderFees()"> 済</label></div>
+  </div>
+  <div class="item-meta" style="margin:-6px 0 12px">期間を指定すると、その期間のギャラだけ表示します。未指定の場合は全期間です。</div>
+  <div id="feeArea" class="list"></div>
+</section>
+
 <section id="data" class="page hidden">
   <div class="header"><div><h1>データ管理</h1><div class="sub">ブラウザのローカル保存を使っています。</div></div></div>
   <div class="card">
@@ -211,8 +239,10 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
 
 <script>
 const KEY='percilog_v1';
-let db=JSON.parse(localStorage.getItem(KEY)||'{"instruments":[],"cases":[],"bands":[],"songs":[],"lists":[]}');
+let db=JSON.parse(localStorage.getItem(KEY)||'{"instruments":[],"cases":[],"bands":[],"songs":[],"lists":[],"performances":[],"fees":[]}');
 db.cases=db.cases||[];
+db.performances=Array.isArray(db.performances)?db.performances.map(x=>({id:x.id||uid(),date:x.date||'',bandId:x.bandId||'',content:x.content||'',venue:x.venue||'',note:x.note||'',feeId:x.feeId||''})):[];
+db.fees=Array.isArray(db.fees)?db.fees.map(x=>({id:x.id||uid(),performanceId:x.performanceId||'',date:x.date||'',bandId:x.bandId||'',content:x.content||'',amount:Number.isFinite(Number(x.amount))?Number(x.amount):0,paid:x.paid===true,receiptIssued:x.receiptIssued===true,paymentMethod:x.paymentMethod||''})):[];
 db.instruments=(db.instruments||[]).map(x=>({...x,subcategories:Array.isArray(x.subcategories)?x.subcategories:[],subcategoryQuantities:(x.subcategoryQuantities&&typeof x.subcategoryQuantities==='object')?x.subcategoryQuantities:{}}));
 db.lists=(db.lists||[]).map(l=>({...l,instruments:Array.isArray(l.instruments)?l.instruments:[],instrumentSelections:Array.isArray(l.instrumentSelections)?l.instrumentSelections:l.instruments.map(id=>{const x=db.instruments.find(i=>i.id===id);return {id,subcategories:x?.subcategories||[],subcategoryQuantities:{}}}),caseSelections:Array.isArray(l.caseSelections)?l.caseSelections:[],done:l.done===true}));
 db.bands=db.bands||[];db.songs=db.songs||[];db.lists=db.lists||[];
@@ -225,7 +255,9 @@ function updateStats(){
  document.getElementById('statInst').textContent=db.instruments.length;
  document.getElementById('statBands').textContent=db.bands.length;
  document.getElementById('statCases').textContent=db.cases.length;
- document.getElementById('dataSummary').innerHTML=`運搬リスト：<b>${db.lists.length}</b>　打楽器：<b>${db.instruments.length}</b>　ケース：<b>${db.cases.length}</b>　バンド：<b>${db.bands.length}</b>　曲：<b>${db.songs.length}</b>`;
+ document.getElementById('statPerformances').textContent=db.performances.length;
+ document.getElementById('statFees').textContent=db.fees.length;
+ document.getElementById('dataSummary').innerHTML=`運搬リスト：<b>${db.lists.length}</b>　打楽器：<b>${db.instruments.length}</b>　ケース：<b>${db.cases.length}</b>　バンド：<b>${db.bands.length}</b>　曲：<b>${db.songs.length}</b>　本番：<b>${db.performances.length}</b>　ギャラ：<b>${db.fees.length}</b>`;
  renderRecent();
 }
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{
@@ -234,7 +266,7 @@ document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{
  window.scrollTo({top:0,left:0,behavior:'auto'});
  renderAll();
 });
-function renderAll(){renderLists();renderInstruments();renderCases();renderBands();renderSongs();updateStats();}
+function renderAll(){renderLists();renderInstruments();renderCases();renderBands();renderSongs();renderPerformances();renderFees();updateStats();}
 
 function addInstrument(){ openInstrumentModal(); }
 function editInstrument(id){ openInstrumentModal(id); }
@@ -393,6 +425,135 @@ function delSong(id){
  if(!confirm(`「${song.name}」を削除しますか？`))return;
  db.songs=db.songs.filter(x=>x.id!==id);db.lists.forEach(l=>l.songs=l.songs.filter(x=>x!==id));save();renderSongList();
 }
+function performanceLabel(p){
+ return `${p.date||'日付未設定'} ｜ ${p.content||'内容未設定'} ｜ ${bandName(p.bandId)}`;
+}
+function sortPerformances(arr){return [...arr].sort((a,b)=>(a.date||'').localeCompare(b.date||'')||compareJapanese(a.content,b.content));}
+function ensurePerformanceFees(){
+ db.performances.forEach(p=>{
+  if(p.feeId && db.fees.some(f=>f.id===p.feeId))return;
+  const linked=db.fees.find(f=>f.performanceId===p.id);
+  if(linked){p.feeId=linked.id;return;}
+  if(!p.feeId){
+   const fee={id:uid(),performanceId:p.id,date:p.date||'',bandId:p.bandId||'',content:p.content||'',amount:null,paid:false,receiptIssued:false,paymentMethod:''};
+   db.fees.push(fee);p.feeId=fee.id;
+  }
+ });
+}
+function renderPerformances(){
+ const area=document.getElementById('performanceArea');if(!area)return;
+ const q=normalizeKanaForSearch(document.getElementById('performanceSearch')?.value||'');
+ const from=document.getElementById('performanceDateFrom')?.value||'', to=document.getElementById('performanceDateTo')?.value||'';
+ const rows=sortPerformances(db.performances).filter(p=>{
+  if(from&&p.date<from)return false;if(to&&p.date>to)return false;
+  return normalizeKanaForSearch(`${p.date} ${p.content} ${p.venue||''} ${bandName(p.bandId)}`).includes(q);
+ });
+ area.innerHTML=rows.length?rows.map(p=>`<div class="item" style="align-items:flex-start"><div class="item-main"><div class="item-title">🎤 ${esc(p.date)}　｜ ${esc(p.content)}</div><div class="item-meta">🎸 ${esc(bandName(p.bandId))}${p.venue?`　｜ 📍 ${esc(p.venue)}`:''}${p.note?`　📝 ${esc(p.note)}`:''}</div></div><div class="actions"><button class="btn secondary small" onclick="openPerformanceModal('${p.id}')">編集</button><button class="btn danger small" onclick="deletePerformance('${p.id}')">削除</button></div></div>`).join(''):'<div class="empty">条件に一致する本番がありません。</div>';
+}
+function resetPerformanceFilters(){
+ const q=document.getElementById('performanceSearch');const from=document.getElementById('performanceDateFrom');const to=document.getElementById('performanceDateTo');
+ if(q)q.value='';if(from)from.value='';if(to)to.value='';renderPerformances();
+}
+function openPerformanceModal(id=null){
+ const old=id?db.performances.find(x=>x.id===id):null;
+ const bandOptions=sortBands(db.bands).map(b=>`<option value="${b.id}" ${old?.bandId===b.id?'selected':''}>${esc(b.name)}</option>`).join('');
+ document.getElementById('modalRoot').innerHTML=`<div class="modal-back" onclick="if(event.target===this)closeModal()"><div class="modal">
+ <div class="modal-head"><h2>${old?'本番を編集':'本番を登録'}</h2><button class="close" onclick="closeModal()">×</button></div>
+ <form onsubmit="submitPerformance(event,'${id||''}')"><div class="form-grid">
+  <div><label>日程 *</label><input type="date" id="fPerfDate" required value="${esc(old?.date||new Date().toISOString().slice(0,10))}"></div>
+  <div><label>バンド</label><select id="fPerfBand"><option value="">選択してください</option>${bandOptions}</select></div>
+  <div class="full"><label>内容 *</label><input id="fPerfContent" required placeholder="例：ライブ、イベント出演" value="${esc(old?.content||'')}"></div>
+  <div class="full"><label>演奏場所（任意）</label><input id="fPerfVenue" placeholder="例：渋谷○○ホール、下北沢○○" value="${esc(old?.venue||'')}"></div>
+  <div class="full"><label>備考（任意）</label><textarea id="fPerfNote" placeholder="集合時間、搬入口、譜面台など">${esc(old?.note||'')}</textarea></div>
+ </div><div style="display:flex;justify-content:flex-end;gap:9px;margin-top:20px"><button type="button" class="btn secondary" onclick="closeModal()">キャンセル</button><button class="btn">保存する</button></div></form>
+ </div></div>`;
+}
+function submitPerformance(e,id){
+ e.preventDefault();
+ const date=document.getElementById('fPerfDate').value, content=document.getElementById('fPerfContent').value.trim(), bandId=document.getElementById('fPerfBand').value, venue=document.getElementById('fPerfVenue').value.trim(), note=document.getElementById('fPerfNote').value.trim();
+ if(!date||!content)return;
+ if(id){const p=db.performances.find(x=>x.id===id);if(!p)return;p.date=date;p.content=content;p.bandId=bandId;p.venue=venue;p.note=note;const linkedFee=db.fees.find(f=>f.performanceId===p.id);if(linkedFee){linkedFee.date=date;linkedFee.bandId=bandId;linkedFee.content=content;p.feeId=linkedFee.id;}}else{const performance={id:uid(),date,content,bandId,venue,note,feeId:''};const fee={id:uid(),performanceId:performance.id,date,bandId,content,amount:null,paid:false,receiptIssued:false,paymentMethod:''};performance.feeId=fee.id;db.performances.push(performance);db.fees.push(fee);}
+ save();closeModal();renderAll();showPage('performances');
+}
+function deletePerformance(id){
+ const p=db.performances.find(x=>x.id===id);if(!p)return;
+ const linked=db.fees.filter(f=>f.performanceId===id).length;
+ const msg=linked?`「${p.content}」を削除しますか？\n紐づいているギャラ${linked}件は削除せず、手入力データとして残します。`:`「${p.content}」を削除しますか？`;
+ if(!confirm(msg))return;
+ db.performances=db.performances.filter(x=>x.id!==id);
+ db.fees.forEach(f=>{if(f.performanceId===id)f.performanceId='';});
+ save();renderAll();
+}
+function feeDisplaySource(f){
+ const p=f.performanceId?db.performances.find(x=>x.id===f.performanceId):null;
+ return p||null;
+}
+function feeInfo(f){
+ const p=feeDisplaySource(f);
+ return {date:p?.date||f.date||'',bandId:(p?.bandId ?? f.bandId ?? ''),content:p?.content||f.content||''};
+}
+function formatYen(n){return n===null||n===undefined||n===''?'未設定':`${Number(n||0).toLocaleString('ja-JP')}円`;}
+function renderFees(){
+ const area=document.getElementById('feeArea');if(!area)return;
+ const q=normalizeKanaForSearch(document.getElementById('feeSearch')?.value||'');
+ const from=document.getElementById('feeDateFrom')?.value||'', to=document.getElementById('feeDateTo')?.value||'';
+ const paidPending=!!document.getElementById('feePaidPending')?.checked, paidDone=!!document.getElementById('feePaidDone')?.checked;
+ const receiptPending=!!document.getElementById('feeReceiptPending')?.checked, receiptDone=!!document.getElementById('feeReceiptDone')?.checked;
+ const rows=[...db.fees].sort((a,b)=>{const aa=feeInfo(a),bb=feeInfo(b);return (aa.date||'').localeCompare(bb.date||'')||compareJapanese(aa.content,bb.content);}).filter(f=>{
+   const i=feeInfo(f);
+   if(from&&i.date<from)return false;if(to&&i.date>to)return false;
+   if(!normalizeKanaForSearch(`${i.date} ${i.content} ${bandName(i.bandId)}`).includes(q))return false;
+   if(paidPending!==paidDone && ((paidDone&&!f.paid)||(paidPending&&f.paid)))return false;
+   if(receiptPending!==receiptDone && ((receiptDone&&!f.receiptIssued)||(receiptPending&&f.receiptIssued)))return false;
+   return true;
+ });
+ const totalAmount=rows.reduce((sum,f)=>sum+(Number.isFinite(Number(f.amount))?Number(f.amount):0),0);
+ const receivedAmount=rows.filter(f=>f.paid).reduce((sum,f)=>sum+(Number.isFinite(Number(f.amount))?Number(f.amount):0),0);
+ const totalHtml=`<div class="card" style="margin:0 0 12px;padding:12px 14px"><b>合計：${totalAmount.toLocaleString('ja-JP')}円</b>　受領済：${receivedAmount.toLocaleString('ja-JP')}円</div>`;
+ area.innerHTML=totalHtml+(rows.length?rows.map(f=>{const i=feeInfo(f);return `<div class="item" style="align-items:flex-start"><div class="item-main"><div class="item-title">💰 ${esc(i.date)}　｜ ${esc(i.content)} <span class="tag">${f.paid?'受取済':'未受取'}</span> <span class="tag">${f.receiptIssued?'領収書済':'領収書未'}</span></div><div class="item-meta">🎸 ${esc(bandName(i.bandId))}　｜ 金額：<b>${esc(formatYen(f.amount))}</b>${f.paymentMethod?`　｜ 受取方法：${esc(f.paymentMethod)}`:''}${f.performanceId?`　｜ 🎤 本番から自動登録`:''}</div></div><div class="actions"><button class="btn secondary small" onclick="openFeeModal('${f.id}')">編集</button><button class="btn danger small" onclick="deleteFee('${f.id}')">削除</button></div></div>`;}).join(''):'<div class="empty">条件に一致するギャラがありません。</div>');
+}
+function resetFeeFilters(){
+ const q=document.getElementById('feeSearch'),from=document.getElementById('feeDateFrom'),to=document.getElementById('feeDateTo');
+ const ids=['feePaidPending','feePaidDone','feeReceiptPending','feeReceiptDone'];
+ if(q)q.value='';if(from)from.value='';if(to)to.value='';ids.forEach(id=>{const x=document.getElementById(id);if(x)x.checked=false;});renderFees();
+}
+function openFeeModal(id=null){
+ const old=id?db.fees.find(x=>x.id===id):null;
+ const linked=!!(old?.performanceId&&db.performances.some(p=>p.id===old.performanceId));
+ const info=old?feeInfo(old):{date:new Date().toISOString().slice(0,10),bandId:'',content:''};
+ const bandOptions=sortBands(db.bands).map(b=>`<option value="${b.id}" ${info.bandId===b.id?'selected':''}>${esc(b.name)}</option>`).join('');
+ const sourceNote=linked?`<div class="item-meta" style="margin-top:6px">🎤 本番管理から自動登録されたギャラです。日程・バンド・内容は本番管理の情報が自動反映されます。</div>`:`<div class="item-meta" style="margin-top:6px">レコーディングなど、本番管理に登録しない収入を手入力できます。</div>`;
+ const fieldAttrs=linked?'readonly disabled':'';
+ document.getElementById('modalRoot').innerHTML=`<div class="modal-back" onclick="if(event.target===this)closeModal()"><div class="modal">
+ <div class="modal-head"><h2>${old?'ギャラを編集':'ギャラを登録'}</h2><button class="close" onclick="closeModal()">×</button></div>
+ <form onsubmit="submitFee(event,'${id||''}')"><div class="form-grid">
+  <div class="full"><label>対象</label><div class="card" style="padding:12px;margin:0">${linked?`🎤 ${esc(info.date)}　｜ ${esc(info.content)}　｜ ${esc(bandName(info.bandId))}`:'新規登録'}</div>${sourceNote}</div>
+  <div><label>日程 *</label><input type="date" id="fFeeDate" required value="${esc(info.date)}" ${fieldAttrs}></div>
+  <div><label>バンド</label><select id="fFeeBand" ${linked?'disabled':''}><option value="">選択してください</option>${bandOptions}</select></div>
+  <div class="full"><label>内容 *</label><input id="fFeeContent" required placeholder="例：ライブ、レコーディング" value="${esc(info.content)}" ${fieldAttrs}></div>
+  <div><label>金額 *</label><input type="number" id="fFeeAmount" min="0" step="1" required value="${esc(old?.amount??'')}"></div>
+  <div><label>受け取り方法</label><input id="fFeeMethod" placeholder="例：振込、現金、PayPay" value="${esc(old?.paymentMethod||'')}"></div>
+  <div><label>受け取り状況</label><label class="check"><input type="checkbox" id="fFeePaid" ${old?.paid?'checked':''}> 受け取り済</label></div>
+  <div><label>領収書発行状況</label><label class="check"><input type="checkbox" id="fFeeReceipt" ${old?.receiptIssued?'checked':''}> 発行済</label></div>
+ </div><div style="display:flex;justify-content:flex-end;gap:9px;margin-top:20px"><button type="button" class="btn secondary" onclick="closeModal()">キャンセル</button><button class="btn">保存する</button></div></form>
+ </div></div>`;
+}
+function submitFee(e,id){
+ e.preventDefault();
+ const old=id?db.fees.find(x=>x.id===id):null;
+ const performanceId=old?.performanceId||'';
+ const linked=!!(performanceId&&db.performances.some(p=>p.id===performanceId));
+ const date=document.getElementById('fFeeDate').value, bandId=document.getElementById('fFeeBand').value, content=document.getElementById('fFeeContent').value.trim();
+ const rawAmount=document.getElementById('fFeeAmount').value;
+ const amount=parseInt(rawAmount||'',10);const paid=!!document.getElementById('fFeePaid').checked;const receiptIssued=!!document.getElementById('fFeeReceipt').checked;const paymentMethod=document.getElementById('fFeeMethod').value.trim();
+ if(!date||!content||!Number.isFinite(amount)||amount<0)return;
+ const data={id:id||uid(),performanceId,date,bandId,content,amount,paid,receiptIssued,paymentMethod};
+ if(linked){const p=db.performances.find(x=>x.id===performanceId);data.date=p.date||date;data.bandId=p.bandId||'';data.content=p.content||content;}
+ if(id){const i=db.fees.findIndex(x=>x.id===id);if(i<0)return;db.fees[i]=data;}else db.fees.push(data);
+ save();closeModal();renderAll();showPage('fees');
+}
+function deleteFee(id){const f=db.fees.find(x=>x.id===id);if(!f)return;if(!confirm('このギャラを削除しますか？'))return;db.fees=db.fees.filter(x=>x.id!==id);save();renderAll();}
+
 function openListModal(id=null){
  const old=id?db.lists.find(x=>x.id===id):null;
  const bandOptions=db.bands.map(b=>`<option value="${b.id}" ${old?.bandId===b.id?'selected':''}>${esc(b.name)}</option>`).join('');
@@ -850,9 +1011,9 @@ function exportData(){
 }
 function importData(e){
  const file=e.target.files[0];if(!file)return;
- const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.instruments||!x.bands||!x.songs||!x.lists)throw Error();db=x;db.cases=db.cases||[];db.instruments=(db.instruments||[]).map(i=>({...i,subcategories:Array.isArray(i.subcategories)?i.subcategories:[],subcategoryQuantities:i.subcategoryQuantities||{},caseId:i.caseId||''}));db.lists=(db.lists||[]).map(l=>({...l,instruments:Array.isArray(l.instruments)?l.instruments:[],instrumentSelections:Array.isArray(l.instrumentSelections)?l.instrumentSelections:l.instruments.map(id=>({id,subcategories:[],subcategoryQuantities:{}})),done:l.done===true}));save();renderAll();alert('データを読み込みました。')}catch{alert('正しいPercPackLog JSONではありません。')}};r.readAsText(file);
+ const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.instruments||!x.bands||!x.songs||!x.lists)throw Error();db=x;db.cases=db.cases||[];db.performances=Array.isArray(db.performances)?db.performances.map(p=>({id:p.id||uid(),date:p.date||'',bandId:p.bandId||'',content:p.content||'',venue:p.venue||'',note:p.note||'',feeId:p.feeId||''})):[];db.fees=Array.isArray(db.fees)?db.fees.map(f=>({id:f.id||uid(),performanceId:f.performanceId||'',date:f.date||'',bandId:f.bandId||'',content:f.content||'',amount:(f.amount===null||f.amount===undefined||f.amount==='')?null:(Number.isFinite(Number(f.amount))?Number(f.amount):0),paid:f.paid===true,receiptIssued:f.receiptIssued===true,paymentMethod:f.paymentMethod||''})):[];ensurePerformanceFees();db.instruments=(db.instruments||[]).map(i=>({...i,subcategories:Array.isArray(i.subcategories)?i.subcategories:[],subcategoryQuantities:i.subcategoryQuantities||{},caseId:i.caseId||''}));db.lists=(db.lists||[]).map(l=>({...l,instruments:Array.isArray(l.instruments)?l.instruments:[],instrumentSelections:Array.isArray(l.instrumentSelections)?l.instrumentSelections:l.instruments.map(id=>({id,subcategories:[],subcategoryQuantities:{}})),done:l.done===true}));save();renderAll();alert('データを読み込みました。')}catch{alert('正しいPercPackLog JSONではありません。')}};r.readAsText(file);
 }
-function clearAll(){if(confirm('すべてのデータを削除します。この操作は元に戻せません。')){db={instruments:[],cases:[],bands:[],songs:[],lists:[]};save();renderAll();}}
+function clearAll(){if(confirm('すべてのデータを削除します。この操作は元に戻せません。')){db={instruments:[],cases:[],bands:[],songs:[],lists:[],performances:[],fees:[]};save();renderAll();}}
 const GUIDE_SEEN_KEY='percpaklog_guide_seen';
 const guideSeen=localStorage.getItem(GUIDE_SEEN_KEY)==='1';
 if(!guideSeen){
@@ -862,6 +1023,8 @@ if(!guideSeen){
   document.getElementById('guide').classList.remove('hidden');
   localStorage.setItem(GUIDE_SEEN_KEY,'1');
 }
+ensurePerformanceFees();
+save();
 renderAll();
 </script>
 </body>
