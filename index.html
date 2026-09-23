@@ -240,7 +240,6 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
     <div class="list-filter-group date-range-filter"><span>期間：</span><input type="date" id="feeDateFrom" onchange="renderFees()"> <span>～</span> <input type="date" id="feeDateTo" onchange="renderFees()"> <button type="button" class="btn small" onclick="resetFeeFilters()">期間リセット</button></div>
     <div class="list-filter-group status-filter"><span>受け取り</span><label class="check compact"><input type="checkbox" id="feePaidPending" onchange="renderFees()"> 未</label><label class="check compact"><input type="checkbox" id="feePaidDone" onchange="renderFees()"> 済</label></div>
     <div class="list-filter-group status-filter"><span>イベント</span><label class="check compact"><input type="checkbox" id="feeEventPending" onchange="renderFees()"> 未</label><label class="check compact"><input type="checkbox" id="feeEventDone" onchange="renderFees()"> 済</label></div>
-    <div class="list-filter-group status-filter"><span>領収書</span><label class="check compact"><input type="checkbox" id="feeReceiptPending" onchange="renderFees()"> 未</label><label class="check compact"><input type="checkbox" id="feeReceiptDone" onchange="renderFees()"> 済</label></div>
   </div>
   <div class="item-meta" style="margin:-6px 0 12px">期間を指定すると、その期間のギャラだけ表示します。未指定の場合は全期間です。</div>
   <div id="feeArea" class="list"></div>
@@ -530,14 +529,12 @@ function renderFees(){
  const from=document.getElementById('feeDateFrom')?.value||'', to=document.getElementById('feeDateTo')?.value||'';
  const paidPending=!!document.getElementById('feePaidPending')?.checked, paidDone=!!document.getElementById('feePaidDone')?.checked;
  const eventPending=!!document.getElementById('feeEventPending')?.checked, eventDone=!!document.getElementById('feeEventDone')?.checked;
- const receiptPending=!!document.getElementById('feeReceiptPending')?.checked, receiptDone=!!document.getElementById('feeReceiptDone')?.checked;
  const rows=[...db.fees].sort((a,b)=>{const aa=feeInfo(a),bb=feeInfo(b);return (aa.date||'').localeCompare(bb.date||'')||compareJapanese(aa.content,bb.content);}).filter(f=>{
    const i=feeInfo(f);
    if(from&&i.date<from)return false;if(to&&i.date>to)return false;
    if(!normalizeKanaForSearch(`${i.date} ${i.content} ${bandName(i.bandId)}`).includes(q))return false;
    if(paidPending!==paidDone && ((paidDone&&!f.paid)||(paidPending&&f.paid)))return false;
    if(eventPending!==eventDone && ((eventDone&&!f.eventDone)||(eventPending&&f.eventDone)))return false;
-   if(receiptPending!==receiptDone && ((receiptDone&&!f.receiptIssued)||(receiptPending&&f.receiptIssued)))return false;
    return true;
  });
  const totalAmount=rows.reduce((sum,f)=>sum+(Number.isFinite(Number(f.amount))?Number(f.amount):0),0);
@@ -547,7 +544,7 @@ function renderFees(){
 }
 function resetFeeFilters(){
  const q=document.getElementById('feeSearch'),from=document.getElementById('feeDateFrom'),to=document.getElementById('feeDateTo');
- const ids=['feePaidPending','feePaidDone','feeEventPending','feeEventDone','feeReceiptPending','feeReceiptDone'];
+ const ids=['feePaidPending','feePaidDone','feeEventPending','feeEventDone'];
  if(q)q.value='';if(from)from.value='';if(to)to.value='';ids.forEach(id=>{const x=document.getElementById(id);if(x)x.checked=false;});renderFees();
 }
 function openFeeModal(id=null){
