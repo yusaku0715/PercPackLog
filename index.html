@@ -108,7 +108,33 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
     .list-filter-group .btn.small{padding:6px 9px;font-size:12px}
     .status-filter{gap:8px}
     .status-filter .check.compact{display:inline-flex;width:auto;margin:0;gap:3px}
+
+
+/* Compact date-range filters on smartphones */
+@media(max-width:800px){
+ .list-filter-group.date-range-filter{
+   width:100%;
+   display:grid;
+   grid-template-columns:auto minmax(0,1fr) auto minmax(0,1fr) auto;
+   align-items:center;
+   gap:4px;
+   white-space:nowrap;
+ }
+ .list-filter-group.date-range-filter input[type=date]{
+   width:100%;
+   min-width:0;
+   flex:none;
+   padding:8px 4px;
+   font-size:13px;
+ }
+ .list-filter-group.date-range-filter .btn.small{
+   padding:7px 6px;
+   font-size:11px;
+   white-space:nowrap;
+ }
+}
 </style>
+
 </head>
 <body>
 <div class="app">
@@ -167,7 +193,7 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
   <div class="header"><div><h1>運搬リスト</h1><div class="sub">本番ごとに「何を持っていくか」を保存。</div></div><button class="btn" onclick="openListModal()">＋ 新規作成</button></div>
   <div class="toolbar">
     <input id="listSearch" placeholder="日付・内容・バンド名で検索" oninput="renderLists()">
-    <div class="list-filter-group"><span>期間：</span><input type="date" id="listDateFrom" onchange="renderLists()"> <span>～</span> <input type="date" id="listDateTo" onchange="renderLists()"> <button type="button" class="btn small" onclick="resetListFilters()">期間リセット</button></div>
+    <div class="list-filter-group date-range-filter"><span>期間：</span><input type="date" id="listDateFrom" onchange="renderLists()"> <span>～</span> <input type="date" id="listDateTo" onchange="renderLists()"> <button type="button" class="btn small" onclick="resetListFilters()">期間リセット</button></div>
     <div class="list-filter-group status-filter"><span>運搬状況</span><label class="check compact"><input type="checkbox" id="listStatusPending" onchange="renderLists()"> 未</label><label class="check compact"><input type="checkbox" id="listStatusDone" onchange="renderLists()"> 済</label></div>
   </div>
   <div class="item-meta" style="margin:-6px 0 12px">期間を指定すると、その期間に運搬するリストだけ表示します。未指定の場合は全期間です。</div>
@@ -200,7 +226,7 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
   <div class="header"><div><h1>本番管理</h1><div class="sub">本番の日程・バンド・内容・演奏場所を登録して一覧化。</div></div><button class="btn" onclick="openPerformanceModal()">＋ 本番を登録</button></div>
   <div class="toolbar">
     <input id="performanceSearch" placeholder="日付・内容・場所・バンド名で検索" oninput="renderPerformances()">
-    <div class="list-filter-group"><span>期間：</span><input type="date" id="performanceDateFrom" onchange="renderPerformances()"> <span>～</span> <input type="date" id="performanceDateTo" onchange="renderPerformances()"> <button type="button" class="btn small" onclick="resetPerformanceFilters()">期間リセット</button></div>
+    <div class="list-filter-group date-range-filter"><span>期間：</span><input type="date" id="performanceDateFrom" onchange="renderPerformances()"> <span>～</span> <input type="date" id="performanceDateTo" onchange="renderPerformances()"> <button type="button" class="btn small" onclick="resetPerformanceFilters()">期間リセット</button></div>
   </div>
   <div class="item-meta" style="margin:-6px 0 12px">期間を指定すると、その期間の本番だけ表示します。未指定の場合は全期間です。</div>
   <div id="performanceArea" class="list"></div>
@@ -210,7 +236,7 @@ label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
   <div class="header"><div><h1>ギャラ管理</h1><div class="sub">本番登録時に自動追加されたギャラと、レコーディングなどの個別登録を管理。</div></div><button class="btn" onclick="openFeeModal()">＋ ギャラを登録</button></div>
   <div class="toolbar">
     <input id="feeSearch" placeholder="日付・内容・バンド名で検索" oninput="renderFees()">
-    <div class="list-filter-group"><span>期間：</span><input type="date" id="feeDateFrom" onchange="renderFees()"> <span>～</span> <input type="date" id="feeDateTo" onchange="renderFees()"> <button type="button" class="btn small" onclick="resetFeeFilters()">期間リセット</button></div>
+    <div class="list-filter-group date-range-filter"><span>期間：</span><input type="date" id="feeDateFrom" onchange="renderFees()"> <span>～</span> <input type="date" id="feeDateTo" onchange="renderFees()"> <button type="button" class="btn small" onclick="resetFeeFilters()">期間リセット</button></div>
     <div class="list-filter-group status-filter"><span>受け取り</span><label class="check compact"><input type="checkbox" id="feePaidPending" onchange="renderFees()"> 未</label><label class="check compact"><input type="checkbox" id="feePaidDone" onchange="renderFees()"> 済</label></div>
     <div class="list-filter-group status-filter"><span>領収書</span><label class="check compact"><input type="checkbox" id="feeReceiptPending" onchange="renderFees()"> 未</label><label class="check compact"><input type="checkbox" id="feeReceiptDone" onchange="renderFees()"> 済</label></div>
   </div>
